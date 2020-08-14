@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Cart - vue.js</title>
+
+	<!-- development version, includes helpful console warnings -->
+	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+</head>
+<body>
+
+	<div id="app">
+		<select v-model="selected_currency">
+			<option v-for="currency_item in currency_list" :key="currency_item.id" v-bind:value="currency_item.id">{{currency_item.name}}</option>
+		</select>
+		<hr>
+
+		<product-cart-item
+			v-for="product in products"
+			v-bind:key="product.id"
+			v-bind:product="product"
+		></product-cart-item>
+
+		<p>{{ name }}: {{ price_convert }} {{ currency.short }} x {{ quantity }} = {{ total }} {{ currency.short }}</p>
+		<button @click="decreaseQuantity">-</button>
+		<input type="text" v-model="quantity" @input="checkInputQuantity">
+		<button @click="increaseQuantity">+</button>
+	</div>
+
+
+	<script>
+		// Определяем новый компонент, названный button-counter
+		Vue.component('product-cart-item', {
+			props: ['product'],
+			computed: {
+				total: function() {
+					return this.product.price * this.product.quantity;
+				}
+			},
+			template: `
+				<p>{{ product.name }}: {{ product.price }} x {{ product.quantity }} = {{ total }}</p>
+			`
+		})
+
+		var app = new Vue({
+			el: '#app',
+			data: {
+				name: 'тест',
+				price: 150,
+				quantity: 1,
+
+				selected_currency: 0,
+				currency_list: [
+					{id: 0, name: 'Рубли', short: 'руб.', value: 1},
+					{id: 1, name: 'Доллары', short: '$', value: 73.46},
+				],
+				products: [
+					{id: 0, name: 'Товар 1', price: 150, quantity: 2},
+					{id: 1, name: 'Товар 2', price: 230, quantity: 1},
+					{id: 2, name: 'Товар 3', price: 1230, quantity: 5},
+				]
+			},
+			computed: {
+				currency: function() {
+					return this.currency_list[ this.selected_currency ];
+				},
+				price_convert: function() {
+					return +(this.price / this.currency.value).toFixed(2);
+				}	,
+				total: function() {
+					return +(this.price_convert * this.quantity).toFixed(2)
+				}				
+			},
+			methods: {
+				checkInputQuantity: function() {
+					console.log(this.quantity);
+					this.quantity = Number(String(this.quantity).replace(/\D+/g, ''));
+					if (this.quantity < 1) { this.quantity = 1; }
+				},
+				increaseQuantity: function() {
+					this.quantity += 1;
+				},
+				decreaseQuantity: function() {
+					if (this.quantity > 1) { this.quantity -= 1; }
+				}
+			}
+		})
+	</script>
+
+	<script>
+		// var app = new Vue({
+		// 	el: '#app',
+		// 	data: {
+		// 		name: 'тест',
+		// 		price: 150,
+		// 		quantity: 1,
+		// 		selected_currency: 0,
+		// 		currency_list: [
+		// 			{id: 0, title: 'Рубли', short: 'руб.', value: 1},
+		// 			{id: 1, title: 'Доллары', short: '$', value: 73.46},
+		// 		]
+		// 	},
+		// 	computed: {
+		// 		currency: function() {
+		// 			return this.currency_list[ this.selected_currency ];
+		// 		},
+		// 		price_convert: function() {
+		// 			return +(this.price / this.currency.value).toFixed(2);
+		// 		}	,
+		// 		total: function() {
+		// 			return +(this.price_convert * this.quantity).toFixed(2)
+		// 		}				
+		// 	},
+		// 	methods: {
+		// 		checkInputQuantity: function() {
+		// 			console.log(this.quantity);
+		// 			this.quantity = Number(String(this.quantity).replace(/\D+/g, ''));
+		// 			if (this.quantity < 1) { this.quantity = 1; }
+		// 		},
+		// 		increaseQuantity: function() {
+		// 			this.quantity += 1;
+		// 		},
+		// 		decreaseQuantity: function() {
+		// 			if (this.quantity > 1) { this.quantity -= 1; }
+		// 		}
+		// 	}
+		// })
+	</script>
+
+
+
+</body>
+</html>
